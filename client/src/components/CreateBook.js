@@ -1,18 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useReducer } from "react";
 import { Link } from "react-router-dom";
 import "../App.css";
 import axios from "axios";
 
-export default function CreateBook() {
-  const [title, setTitle] = useState("");
-  const [isbn, setIsbn] = useState("");
-  const [author, setAuthor] = useState("");
-  const [description, setDescription] = useState("");
-  const [published_date, setPublished_date] = useState("");
-  const [publisher, setPublisher] = useState("");
+export default function CreateBook(props) {
+  const [bookInfo, setBookInfo] = useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      title: "",
+      isbn: "",
+      author: "",
+      description: "",
+      published_date: "",
+      publisher: "",
+    }
+  );
 
   function handleChange(e) {
-    ///use Reducer
+    const { name, value } = e.target;
+    setBookInfo({ [name]: value });
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    const data = {
+      bookInfo,
+    };
+
+    axios
+      .post("http://localhost:8000/api/books", data)
+      .then((res) => {
+        setBookInfo({
+          title: "",
+          isbn: "",
+          author: "",
+          description: "",
+          published_date: "",
+          publisher: "",
+        });
+        props.history.push("/");
+      })
+      .catch((err) => {
+        console.log("Error in CreateBook!", err);
+      });
   }
 
   return (
